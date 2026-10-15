@@ -1,0 +1,76 @@
+{
+  "source": {
+    "repository": "https://github.com/KhronosGroup/glTF-Sample-Assets",
+    "raw_base": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets",
+    "commit": "f36bfdabd1031c3cf6689a50570b8cdf3678b49c",
+    "note": "Every model is fetched as <raw_base>/<commit>/<path>; the commit is pinned so downloads never track a moving branch. Per-model copyright, license and attribution below come from each model's README under Models/<name>/ at that commit."
+  },
+  "models": [
+    {
+      "name": "BoxTextured",
+      "file": "BoxTextured.glb",
+      "path": "Models/BoxTextured/glTF-Binary/BoxTextured.glb",
+      "sha256": "b510eca2e2ef33f62f9ed57d6e7ce2d10ebb2bdebc4a8e59d347719ba81abdf4",
+      "bytes": 5956,
+      "features": ["base_color_texture"],
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "attribution": "Copyright 2017 Cesium (CC BY 4.0). The Cesium logo is a non-copyrightable trademark of Cesium."
+      }
+    },
+    {
+      "name": "DamagedHelmet",
+      "file": "DamagedHelmet.glb",
+      "path": "Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
+      "sha256": "a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8",
+      "bytes": 3773916,
+      "features": [
+        "base_color_texture",
+        "metallic_roughness_texture",
+        "normal_texture",
+        "emissive_texture",
+        "occlusion_texture"
+      ],
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "attribution": "Copyright 2018 ctxwing (CC BY 4.0), rebuild and conversion to glTF; earlier version Copyright 2016 theblueturtle_ (CC BY-NC 4.0)."
+      }
+    },
+    {
+      "name": "AlphaBlendModeTest",
+      "file": "AlphaBlendModeTest.glb",
+      "path": "Models/AlphaBlendModeTest/glTF-Binary/AlphaBlendModeTest.glb",
+      "sha256": "37c3577d143071b42dd46e9d942b157837eb25c6340112171d7faecaa987b14e",
+      "bytes": 2978812,
+      "features": ["alpha_mode_opaque", "alpha_mode_mask", "alpha_mode_blend"],
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "attribution": "Copyright 2018 Analytical Graphics, Inc., Ed Mackey (CC BY 4.0)."
+      }
+    },
+    {
+      "name": "Fox",
+      "file": "Fox.glb",
+      "path": "Models/Fox/glTF-Binary/Fox.glb",
+      "sha256": "d97044e701822bac5a62696459b27d7b375aada5de8574ed4362edbba94771f7",
+      "bytes": 162852,
+      "features": ["skinning", "skeletal_animation"],
+      "license": {
+        "spdx": "CC0-1.0 AND CC-BY-4.0",
+        "attribution": "Model Copyright 2014 PixelMannen (CC0 1.0); rigging & animation Copyright 2014 tomkranis (CC BY 4.0); glTF conversion Copyright 2017 @AsoboStudio and @scurest (CC BY 4.0)."
+      }
+    },
+    {
+      "name": "AnimatedMorphCube",
+      "file": "AnimatedMorphCube.glb",
+      "path": "Models/AnimatedMorphCube/glTF-Binary/AnimatedMorphCube.glb",
+      "sha256": "214ee56160a50dbf22543a1d66dbf860986e87f0efac3d89feac1359d0e6aeab",
+      "bytes": 6752,
+      "features": ["morph_targets", "morph_target_animation"],
+      "license": {
+        "spdx": "CC0-1.0",
+        "attribution": "Copyright 2017 Microsoft, public domain (CC0 1.0)."
+      }
+    }
+  ]
+}

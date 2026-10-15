@@ -1,0 +1,93 @@
+[package]
+name = "waterui-model3d"
+version = "0.1.0"
+authors = ["Lexo Liu <me@lexo.cool>"]
+edition = "2024"
+rust-version = "1.95"
+description = "High-performance glTF 3D model viewer component for WaterUI"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/water-rs/model3d"
+keywords = ["waterui", "wgpu", "gltf", "3d"]
+categories = ["graphics", "gui"]
+
+# `Model3D` is a WaterUI `View` whose pixels come from a `GpuContent` hosted
+# by `waterui-graphics`' shared GPU runtime, so the crate lives in the same
+# dependency universe as upstream `dev`: waterui-core + waterui-graphics +
+# nami 0.12. The exact upstream commit is recorded in Cargo.lock.
+#
+# Consumers must carry the `[patch.crates-io]` block below: `[patch]` in a
+# dependency's manifest does not propagate downstream, so without it this
+# graph resolves the crates.io wgpu/suiteki builds while waterui resolves the
+# water-rs forks — two different `wgpu`/`Signal` types.
+[dependencies]
+waterui-core = { git = "https://github.com/water-rs/waterui", branch = "dev" }
+waterui-graphics = { git = "https://github.com/water-rs/waterui", branch = "dev" }
+nami = "0.12"
+wgpu = "30"
+gltf = { version = "1.4.1", features = [
+    "extensions",
+    "KHR_materials_unlit",
+    "KHR_texture_transform",
+    "KHR_materials_emissive_strength",
+] }
+glam = "0.33"
+bevy_mikktspace = "1"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+blocking = "1.7"
+bytemuck = { version = "1", features = ["derive"] }
+serde_json = "1"
+arc-swap = "1"
+
+[dev-dependencies]
+futures-util = "0.3"
+clap = { version = "4", features = ["derive"] }
+kurbo = "0.13"
+pollster = "1"
+serde = { version = "1", features = ["derive"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+# The interactive `viewer` example hosts the view in a winit window; winit's
+# AndroidActivity path does not compile for plain ELF binaries, so the
+# Android/headless targets (benchmark, offscreen) never see it.
+[target.'cfg(not(target_os = "android"))'.dev-dependencies]
+winit = "0.30"
+
+# Every wgpu-family crate must resolve to the water-rs fork: upstream waterui
+# patches them for a hal fix (water-rs/cherenkov#229) and `[patch]` does not
+# apply downstream. suiteki 0.1.1 on crates.io implements nami-core 0.3's
+# `Signal`; the fork implements 0.4's.
+[patch.crates-io]
+naga = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
+naga-types = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
+wgpu = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
+wgpu-core = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
+wgpu-core-deps-apple = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
+wgpu-core-deps-emscripten = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
+wgpu-core-deps-windows-linux-android = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
+wgpu-hal = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
+wgpu-naga-bridge = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
+wgpu-types = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
+suiteki = { git = "https://github.com/water-rs/suiteki", rev = "7cf17bdba0e978d388a096b1916daebdc17253b4" }
+
+[lints.rust]
+missing_docs = "warn"
+missing_debug_implementations = "warn"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+style = { level = "warn", priority = -1 }
+correctness = { level = "warn", priority = -1 }
+complexity = { level = "warn", priority = -1 }
+suspicious = { level = "warn", priority = -1 }
+perf = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+cargo = { level = "warn", priority = -1 }
+# Transitive version duplicates are upstream's to unify; mirror the root
+# manifest's rule (priority 1 beats group levels).
+multiple_crate_versions = { level = "allow", priority = 1 }
+undocumented_unsafe_blocks = "warn"
+
+[package.metadata.docs.rs]
+features = []

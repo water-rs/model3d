@@ -84,7 +84,9 @@ jobs:
             echo "AR_aarch64_linux_android=$bin/llvm-ar"
             echo "CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$bin/aarch64-linux-android35-clang"
           } >> "$GITHUB_ENV"
-      - run: cargo clippy --locked --target ${{ matrix.target }} --lib --examples --tests -- -D warnings
+      # `viewer` is the desktop winit host; the device-side examples are
+      # `benchmark` and `offscreen`.
+      - run: cargo clippy --locked --target ${{ matrix.target }} --lib --tests --example benchmark --example offscreen -- -D warnings
 
   fixture-script:
     name: Model fetch script

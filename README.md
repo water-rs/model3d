@@ -104,9 +104,9 @@ p50/p95 as JSON together with adapter and workload facts from the glTF
 metadata. `render_offscreen` is deliberately not used — it recreates setup
 and readback per call. Refuses to run on a software CPU adapter. A no-clip
 run additionally reports whether the static model requested further redraws
-after initial readiness (`checks.static_model_idle`).
+after initial readiness (`checks.static_idle`).
 
-### `viewer` — interactive winit host
+### `viewer` — interactive winit host (desktop)
 
 ```sh
 cargo run --example viewer -- --model assets/models/Fox.glb --clip Survey

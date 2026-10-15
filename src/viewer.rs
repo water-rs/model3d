@@ -326,15 +326,14 @@ impl GpuContent for ModelContent {
 /// keyboard input write back into them.
 ///
 /// ```no_run
-/// use waterui_core::Binding;
 /// use waterui_model3d::{Model, Model3D, OrbitCamera, Playback};
 ///
 /// # async fn example() -> Result<(), waterui_model3d::LoadError> {
 /// let model = Model::load("assets/model.glb").await?;
-/// let camera = Binding::new(
-///     OrbitCamera::fit(&model.bounds(), 16.0 / 9.0).unwrap_or_default(),
+/// let camera = nami::binding(
+///     OrbitCamera::fit(&model.bounds(), 16.0 / 9.0).expect("model has finite bounds"),
 /// );
-/// let playback = Binding::new(Playback::new());
+/// let playback = nami::binding(Playback::new());
 /// let view = Model3D::new(model).camera(camera).playback(playback);
 /// # Ok(())
 /// # }

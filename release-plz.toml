@@ -1,0 +1,8 @@
+[workspace]
+# Crate is not published to crates.io; release-plz only manages the
+# release PR and git tag / GitHub release on the main branch.
+publish = false
+# Release on every push to main instead of only when the release PR is
+# merged; this is the default, stated explicitly because an unpublished
+# crate must still get tag/release progression.
+release_always = true

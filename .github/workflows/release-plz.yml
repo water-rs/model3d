@@ -1,0 +1,65 @@
+name: Release
+
+# Only main owns release/tag progression; pushes to dev never trigger
+# a release. cargo publish is disabled in release-plz.toml, so
+# `release-plz release` only pushes the git tag and creates the GitHub
+# release — no registry token is needed or provided.
+on:
+  push:
+    branches: [main]
+
+jobs:
+  # Release unpublished packages: push the git tag and create the
+  # GitHub release for the version in Cargo.toml once it lands on main.
+  release-plz-release:
+    name: Release-plz release
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'water-rs' }}
+    permissions:
+      # Push tags, and create releases.
+      contents: write
+      # Detect the release PR and its commits.
+      pull-requests: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          # Full history is required to release from the latest commit
+          # of the release PR.
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run release-plz
+        uses: release-plz/action@v0.5
+        with:
+          command: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
+  # Create a PR with the new versions and changelog, preparing the
+  # next release.
+  release-plz-pr:
+    name: Release-plz PR
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'water-rs' }}
+    permissions:
+      contents: write
+      pull-requests: write
+    concurrency:
+      group: release-plz-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run release-plz
+        uses: release-plz/action@v0.5
+        with:
+          command: release-pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

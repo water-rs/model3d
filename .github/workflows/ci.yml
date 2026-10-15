@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+
+env:
+  MACOSX_DEPLOYMENT_TARGET: "26.0"
+  IPHONEOS_DEPLOYMENT_TARGET: "26.0"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  check:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-26, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ${{ matrix.os }}
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Fetch pinned reference models
+        run: python scripts/fetch_models.py
+      - name: CPU unit tests
+        run: cargo test --locked --lib --test model --test assets
+      - name: Doc tests
+        run: cargo test --locked --doc
+      # GPU tests are #[ignore]d and opt-in; they only run on macOS where
+      # Metal is always available. Linux/Windows runs above never invoke them.
+      - name: GPU tests (Metal)
+        if: matrix.os == 'macos-26'
+        run: cargo test --locked --lib --test gpu -- --ignored
+
+  mobile:
+    name: ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-linux-android
+            os: ubuntu-latest
+          - target: aarch64-apple-ios
+            os: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ${{ matrix.target }}
+      - name: Android NDK compilers
+        if: matrix.target == 'aarch64-linux-android'
+        run: |
+          bin="$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          {
+            echo "CC_aarch64_linux_android=$bin/aarch64-linux-android35-clang"
+            echo "AR_aarch64_linux_android=$bin/llvm-ar"
+            echo "CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$bin/aarch64-linux-android35-clang"
+          } >> "$GITHUB_ENV"
+      - run: cargo clippy --locked --target ${{ matrix.target }} --lib --examples --tests -- -D warnings
+
+  fixture-script:
+    name: Model fetch script
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - run: python -m py_compile scripts/fetch_models.py

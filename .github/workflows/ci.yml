@@ -36,6 +36,24 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
+      # The engine compiles its shaders to DXIL on Windows through `dxc`.
+      - name: Install DirectX Shader Compiler
+        if: runner.os == 'Windows'
+        # The framework's install-dxc restores the compiler from the Actions
+        # cache, so a warm run downloads nothing (water-rs/waterui#3942).
+        uses: water-rs/waterui/.github/actions/install-dxc@dev
+      - name: Install SPIRV-Tools
+        if: runner.os == 'Windows'
+        id: msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: false
+          install: mingw-w64-ucrt-x86_64-spirv-tools
+      - name: Put SPIRV-Tools on the PATH
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Add-Content -Path $env:GITHUB_PATH -Value "${{ steps.msys2.outputs.msys2-location }}\ucrt64\bin"
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: ${{ matrix.os }}

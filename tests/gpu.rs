@@ -6,8 +6,8 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
+use waterui_graphics::gpu::wgpu;
 use waterui_graphics::gpu::{Context, Frame, RedrawHandle};
-use waterui_graphics::wgpu;
 use waterui_model3d::{Model, Model3D};
 
 #[test]
@@ -42,15 +42,16 @@ fn static_content_stays_idle_and_recreates_all_device_resources() {
             pollster::block_on(adapter.request_device(&wgpu::DeviceDescriptor::default())).unwrap();
         let format = wgpu::TextureFormat::Rgba16Float;
         let count = Arc::clone(&wakes);
-        content.setup(&Context {
-            adapter: &adapter,
-            device: &device,
-            queue: &queue,
+        content.setup(&Context::new(
+            &instance,
+            &adapter,
+            &device,
+            &queue,
             format,
-            redraw: RedrawHandle::new(move || {
+            RedrawHandle::new(move || {
                 count.fetch_add(1, Ordering::Relaxed);
             }),
-        });
+        ));
         let texture = device.create_texture(&wgpu::TextureDescriptor {
             label: Some("model3d-recreation-test"),
             size: wgpu::Extent3d {
@@ -77,6 +78,7 @@ fn static_content_stays_idle_and_recreates_all_device_resources() {
                 (256, 256),
                 1.0,
                 (Duration::from_millis(index * 16), Duration::from_millis(16)),
+                None,
             );
             content.render(&mut frame);
             device

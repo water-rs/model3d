@@ -4,7 +4,7 @@ A [WaterUI](https://github.com/water-rs/waterui) component that loads and render
 glTF 2.0 models on GPU. Built on `waterui-graphics`' shared GPU runtime
 (wgpu 30): `Model3D` produces a `GpuContentView` whose `GpuContent` renders
 on the engine's render thread into a premultiplied linear Display-P3 target.
-This crate always consumes wgpu through the `waterui_graphics::wgpu`
+This crate always consumes wgpu through the `waterui_graphics::gpu::wgpu`
 re-export so the wgpu pin lives in exactly one place.
 
 ## Status

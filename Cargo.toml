@@ -13,7 +13,7 @@ categories = ["graphics", "gui"]
 # `Model3D` is a WaterUI `View` whose pixels come from a `GpuContent` hosted
 # by `waterui-graphics`' shared GPU runtime, so the crate lives in the same
 # dependency universe as upstream `dev`: waterui-core + waterui-graphics +
-# nami 0.12. The exact upstream commit is recorded in Cargo.lock.
+# nami 0.13. The exact upstream commit is recorded in Cargo.lock.
 #
 # Consumers must carry the `[patch.crates-io]` block below: `[patch]` in a
 # dependency's manifest does not propagate downstream, so without it this
@@ -22,7 +22,7 @@ categories = ["graphics", "gui"]
 [dependencies]
 waterui-core = { git = "https://github.com/water-rs/waterui", branch = "dev" }
 waterui-graphics = { git = "https://github.com/water-rs/waterui", branch = "dev" }
-nami = "0.12"
+nami = "0.13"
 wgpu = "30"
 gltf = { version = "1.4.1", features = [
     "extensions",
@@ -54,21 +54,23 @@ tracing-subscriber = "0.3"
 winit = "0.30"
 
 # Every wgpu-family crate must resolve to the water-rs fork: upstream waterui
-# patches them for a hal fix (water-rs/cherenkov#229) and `[patch]` does not
+# patches them for a hal fix (branch fix/metal-shared-memory-v30) and `[patch]` does not
 # apply downstream. suiteki 0.1.1 on crates.io implements nami-core 0.3's
-# `Signal`; the fork implements 0.4's.
+# `Signal`; suiteki dev implements 0.5's (water-rs/suiteki#29).
 [patch.crates-io]
-naga = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
-naga-types = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
-wgpu = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
-wgpu-core = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
-wgpu-core-deps-apple = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
-wgpu-core-deps-emscripten = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
-wgpu-core-deps-windows-linux-android = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
-wgpu-hal = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
-wgpu-naga-bridge = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
-wgpu-types = { git = "https://github.com/water-rs/wgpu", rev = "11e85956a78886d1a96d586f255ea9b0661da2cd" }
-suiteki = { git = "https://github.com/water-rs/suiteki", rev = "7cf17bdba0e978d388a096b1916daebdc17253b4" }
+naga = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
+naga-types = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
+wgpu = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
+wgpu-core = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
+wgpu-core-deps-apple = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
+wgpu-core-deps-emscripten = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
+wgpu-core-deps-windows-linux-android = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
+wgpu-hal = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
+wgpu-naga-bridge = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
+wgpu-types = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
+suiteki = { git = "https://github.com/water-rs/suiteki", branch = "dev" }
+shaderloom = { git = "https://github.com/water-rs/shaderloom", branch = "dev" }
+wgpu-external-frame = { git = "https://github.com/water-rs/wgpu-external-frame", branch = "dev" }
 
 [lints.rust]
 missing_docs = "warn"

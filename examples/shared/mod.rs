@@ -12,7 +12,7 @@ use std::time::Duration;
 
 use clap::Args;
 use serde::Serialize;
-use waterui_graphics::wgpu;
+use waterui_graphics::gpu::wgpu;
 use waterui_model3d::{Model, OrbitCamera, Playback};
 
 /// Model, viewport and pose arguments common to every example.

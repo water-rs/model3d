@@ -23,10 +23,9 @@ use waterui_core::{Binding, Computed, Environment, View};
 use waterui_graphics::WorkingColor;
 use waterui_graphics::color::working;
 use waterui_graphics::color::{Srgb, srgb_to_linear};
-use waterui_graphics::draw::kurbo::Point;
 use waterui_graphics::gpu::{Context, Frame, GpuContent, GpuContentView, RedrawHandle};
 use waterui_graphics::input::{
-    Key, Modifiers, NamedKey, ScrollUnit, SurfaceInputEvent, SurfacePointerButton,
+    Key, Modifiers, NamedKey, Point, ScrollUnit, SurfaceInputEvent, SurfacePointerButton,
 };
 
 use crate::camera::OrbitCamera;
@@ -208,8 +207,9 @@ impl GpuContent for ModelContent {
         // Install the wake handle for UI watchers, then (re)build every
         // device-bound resource. A device loss lands here again with fresh
         // handles; the slot is *replaced*, never accumulated.
-        self.redraw_slot.store(Some(Arc::new(gpu.redraw.clone())));
-        let mut renderer = Renderer::new(gpu.device, gpu.queue, gpu.format, self.msaa_samples);
+        self.redraw_slot.store(Some(Arc::new(gpu.redraw().clone())));
+        let mut renderer =
+            Renderer::new(gpu.device(), gpu.queue(), gpu.format(), self.msaa_samples);
         let model = self.inputs.load_full().model.clone();
         renderer.upload(&model);
         self.renderer = Some(renderer);
@@ -625,6 +625,7 @@ impl Model3D {
                     pressed,
                     button,
                     position,
+                    ..
                 } => {
                     on_pointer_button(&mut st, *button, *pressed, *position, interaction);
                 }

@@ -13,8 +13,8 @@ use std::time::{Duration, Instant};
 
 use clap::Parser;
 use nami::{Binding, Signal};
+use waterui_graphics::gpu::wgpu;
 use waterui_graphics::gpu::{Context, Frame, GpuContent, GpuContentView, RedrawHandle};
-use waterui_graphics::wgpu;
 use waterui_model3d::{Model, Model3D, OrbitCamera};
 
 use shared::CommonArgs;
@@ -40,6 +40,7 @@ struct Args {
 }
 
 struct Gpu {
+    instance: wgpu::Instance,
     adapter: wgpu::Adapter,
     device: wgpu::Device,
     queue: wgpu::Queue,
@@ -61,6 +62,7 @@ fn init_gpu() -> Result<Gpu> {
         ..Default::default()
     }))?;
     Ok(Gpu {
+        instance,
         adapter,
         device,
         queue,
@@ -130,6 +132,7 @@ impl Driver {
             self.size,
             1.0,
             (self.elapsed, Self::DELTA),
+            None,
         );
         self.content.render(&mut frame);
         Ok(frame.redraw_requested())
@@ -228,15 +231,16 @@ fn main() -> Result<()> {
     let wakes = Arc::new(AtomicU64::new(0));
     let count = Arc::clone(&wakes);
     let setup_started = Instant::now();
-    driver.content.setup(&Context {
-        adapter: &gpu.adapter,
-        device: &gpu.device,
-        queue: &gpu.queue,
-        format: FORMAT,
-        redraw: RedrawHandle::new(move || {
+    driver.content.setup(&Context::new(
+        &gpu.instance,
+        &gpu.adapter,
+        &gpu.device,
+        &gpu.queue,
+        FORMAT,
+        RedrawHandle::new(move || {
             count.fetch_add(1, Ordering::Relaxed);
         }),
-    });
+    ));
     let setup_cpu_ms = milliseconds(setup_started.elapsed());
     // Always initialize fully, including --warmup=0. Setup uploads and the
     // first frame's requests are excluded from idle and timing accounting.

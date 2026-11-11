@@ -14,17 +14,19 @@
 mod shared;
 
 use std::error::Error;
+use std::num::NonZeroU32;
 use std::sync::Arc;
 
 use clap::Parser;
 use nami::{Signal, binding};
-use waterui_graphics::cherenkov::{Display, FrameTime};
 use waterui_graphics::gpu::runtime::GpuContentRenderer;
+use waterui_graphics::gpu::wgpu;
+use waterui_graphics::gpu::{Display, FrameTime};
 use waterui_graphics::gpu::{GpuContentView, RedrawHandle};
 use waterui_graphics::input::{
-    Key, Modifiers, NamedKey, ScrollUnit, SurfaceInputEvent, SurfacePointerButton,
+    Key, Modifiers, NamedKey, ScrollPhase, ScrollUnit, SurfaceInputEvent, SurfacePointerButton,
 };
-use waterui_graphics::{GpuRuntime, OffscreenSize, wgpu};
+use waterui_graphics::{GpuRuntime, OffscreenSize};
 use waterui_model3d::{Model, Model3D, Playback};
 use winit::application::ApplicationHandler;
 use winit::dpi::LogicalSize;
@@ -125,7 +127,7 @@ impl Host {
     fn to_input(&self, event: &WindowEvent) -> Option<SurfaceInputEvent> {
         match event {
             WindowEvent::CursorMoved { position, .. } => Some(SurfaceInputEvent::PointerMove {
-                position: waterui_graphics::draw::kurbo::Point::new(
+                position: waterui_graphics::input::Point::new(
                     position.x / f64::from(self.scale),
                     position.y / f64::from(self.scale),
                 ),
@@ -142,7 +144,8 @@ impl Host {
                 Some(SurfaceInputEvent::PointerButton {
                     pressed: *state == ElementState::Pressed,
                     button,
-                    position: waterui_graphics::draw::kurbo::Point::new(0.0, 0.0),
+                    position: waterui_graphics::input::Point::new(0.0, 0.0),
+                    click_count: NonZeroU32::MIN,
                 })
             }
             WindowEvent::MouseWheel { delta, .. } => {
@@ -153,11 +156,11 @@ impl Host {
                     MouseScrollDelta::PixelDelta(p) => (p.x, p.y, ScrollUnit::Pixel),
                 };
                 Some(SurfaceInputEvent::Scroll {
-                    position: waterui_graphics::draw::kurbo::Point::new(0.0, 0.0),
+                    position: waterui_graphics::input::Point::new(0.0, 0.0),
                     delta_x: dx,
                     delta_y: dy,
                     unit,
-                    finished: true,
+                    phase: ScrollPhase::Discrete,
                 })
             }
             WindowEvent::KeyboardInput {

@@ -27,7 +27,7 @@ use glam::{Mat3, Mat4, Vec3, Vec4};
 // `wgpu` crosses the public `GpuContent` boundary (`Context`/`Frame` hand us
 // the engine's device, queue and texture), so it comes through
 // `waterui-graphics`' re-export — one GPU type universe, no version drift.
-use waterui_graphics::wgpu;
+use waterui_graphics::gpu::wgpu;
 
 use crate::model::{
     AlphaMode, Model, ModelData, MorphDelta, SkinVertex, Trs, Vertex, anim,
@@ -312,7 +312,7 @@ impl Renderer {
         // `shader_module` prepends cherenkov's shared WGSL helpers — the
         // fragment shader converts linear sRGB into the target's
         // premultiplied linear Display-P3 through `cherenkov_linear_srgb`.
-        let shader = waterui_graphics::cherenkov_gpu::interop::shader_module(
+        let shader = waterui_graphics::gpu::interop::shader_module(
             &device,
             SHADER_LABEL,
             include_str!("shaders/model.wgsl"),
@@ -1854,7 +1854,7 @@ mod tests {
     use std::time::Duration;
 
     use glam::Vec3;
-    use waterui_graphics::wgpu;
+    use waterui_graphics::gpu::wgpu;
 
     use super::{FrameParams, Renderer};
     use crate::{Model, OrbitCamera, Playback};

@@ -68,9 +68,9 @@ wgpu-core-deps-windows-linux-android = { git = "https://github.com/water-rs/wgpu
 wgpu-hal = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
 wgpu-naga-bridge = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
 wgpu-types = { git = "https://github.com/water-rs/wgpu", branch = "fix/metal-shared-memory-v30" }
-suiteki = { git = "https://github.com/water-rs/suiteki", branch = "dev" }
-shaderloom = { git = "https://github.com/water-rs/shaderloom", branch = "dev" }
-wgpu-external-frame = { git = "https://github.com/water-rs/wgpu-external-frame", branch = "dev" }
+suiteki = { git = "https://github.com/water-rs/suiteki", branch = "main" }
+shaderloom = { git = "https://github.com/water-rs/shaderloom", branch = "main" }
+wgpu-external-frame = { git = "https://github.com/water-rs/wgpu-external-frame", branch = "main" }
 
 [lints.rust]
 missing_docs = "warn"

@@ -2940,7 +2940,7 @@ dependencies = [
 [[package]]
 name = "shaderloom"
 version = "0.2.1"
-source = "git+https://github.com/water-rs/shaderloom?branch=dev#0fe16ec3fb7329e6f24a39c4d466f5f2ff21f12d"
+source = "git+https://github.com/water-rs/shaderloom?branch=main#0fe16ec3fb7329e6f24a39c4d466f5f2ff21f12d"
 dependencies = [
  "serde",
  "toml",
@@ -3098,7 +3098,7 @@ checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 [[package]]
 name = "suiteki"
 version = "0.1.1"
-source = "git+https://github.com/water-rs/suiteki?branch=dev#3ba2ad03ccc9379b9fe836dca89875a89d8e0684"
+source = "git+https://github.com/water-rs/suiteki?branch=main#3ba2ad03ccc9379b9fe836dca89875a89d8e0684"
 dependencies = [
  "nami-core",
 ]
@@ -3884,7 +3884,7 @@ dependencies = [
 [[package]]
 name = "wgpu-external-frame"
 version = "0.4.0"
-source = "git+https://github.com/water-rs/wgpu-external-frame?branch=dev#b8c085500813e034306afbcaa23b9a0f77392f41"
+source = "git+https://github.com/water-rs/wgpu-external-frame?branch=main#b8c085500813e034306afbcaa23b9a0f77392f41"
 dependencies = [
  "ash",
  "libc",

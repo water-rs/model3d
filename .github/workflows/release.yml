@@ -1,0 +1,93 @@
+name: Release
+
+# Every push to `main` runs both jobs: `release` creates the git tag and GitHub
+# release (crates.io publishing is disabled in `release-plz.toml`), and
+# `release-pr` opens or refreshes the version bump and changelog pull request
+# against `main`. Merging that pull request is the release.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+jobs:
+  release:
+    name: Release unpublished packages
+    runs-on: ubuntu-latest
+    concurrency:
+      group: release-${{ github.ref_name }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+      # The water-rs fork of release-plz (from release-plz-v0.3.161) treats a
+      # package it cannot compare with the registry as changed instead of
+      # aborting.
+      - uses: taiki-e/cache-cargo-install-action@v3
+        with:
+          tool: release-plz
+          git: https://github.com/water-rs/release-plz
+          rev: 3f421b280f377c2899f3a3750b4ad7a4f7e613c1
+          locked: true
+      - uses: release-plz/git-config@v0.1.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # `publish = false` in release-plz.toml: cut the changelog, tag, and
+      # GitHub release without OIDC token minting.
+      - run: >-
+          release-plz release
+          --git-token "${GITHUB_TOKEN}"
+          --repo-url "https://github.com/${GITHUB_REPOSITORY}"
+          --forge github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-pr:
+    name: Prepare the next release
+    runs-on: ubuntu-latest
+    concurrency:
+      group: release-plz-pr
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/cache-cargo-install-action@v3
+        with:
+          tool: release-plz
+          git: https://github.com/water-rs/release-plz
+          rev: 3f421b280f377c2899f3a3750b4ad7a4f7e613c1
+          locked: true
+      - uses: release-plz/git-config@v0.1.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # `-o json` prints the release pull request release-plz created or
+      # updated, if any, on stdout and leaves the progress log on stderr.
+      - id: release-plz
+        run: |
+          report=$(release-plz release-pr \
+            --git-token "${GITHUB_TOKEN}" \
+            --repo-url "https://github.com/${GITHUB_REPOSITORY}" \
+            --forge github \
+            -o json)
+          echo "${report}"
+          pr=$(jq -c '.prs[0] // empty' <<< "${report}")
+          echo "pr=${pr}" >> "${GITHUB_OUTPUT}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # GitHub holds the pull request runs of a pull request the Actions bot
+      # opened or pushed until they are approved, and the required
+      # `CI result` reports only from those runs.
+      - name: Approve the release PR's CI
+        if: steps.release-plz.outputs.pr != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.release-plz.outputs.pr }}
+        run: bash .github/scripts/approve-held-runs.sh "$(jq -er .number <<<"$PR")"

@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [dev, main]
+    branches: [main]
   pull_request:
 
 env:
@@ -14,8 +14,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  bump:
+    # release-plz bump pull requests (`release-plz-*` heads) change only
+    # versions and the changelog, so this job skips itself and every other
+    # job skips through `needs: bump`.
+    name: Not a release bump
+    if: ${{ !startsWith(github.head_ref, 'release-plz-') }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${GITHUB_HEAD_REF:-$GITHUB_REF_NAME} is not a release bump"
+
   fmt:
     name: Format
+    needs: bump
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,6 +37,7 @@ jobs:
 
   check:
     name: ${{ matrix.os }}
+    needs: bump
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -75,6 +87,7 @@ jobs:
 
   mobile:
     name: ${{ matrix.target }}
+    needs: bump
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -108,6 +121,7 @@ jobs:
 
   fixture-script:
     name: Model fetch script
+    needs: bump
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -115,3 +129,22 @@ jobs:
         with:
           python-version: "3.x"
       - run: python -m py_compile scripts/fetch_models.py
+
+  result:
+    # The single check the `main` ruleset requires: it passes when every
+    # job passed or was skipped (release-plz bump pull requests skip all).
+    name: CI result
+    if: always()
+    needs: [bump, fmt, check, mobile, fixture-script]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check job results
+        env:
+          RESULTS: ${{ join(needs.*.result, ', ') }}
+          FAILED: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "job results: $RESULTS"
+          if [ "$FAILED" = "true" ]; then
+            echo "::error::one or more jobs failed or were cancelled"
+            exit 1
+          fi

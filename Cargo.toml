@@ -20,8 +20,8 @@ categories = ["graphics", "gui"]
 # graph resolves the crates.io wgpu/suiteki builds while waterui resolves the
 # water-rs forks — two different `wgpu`/`Signal` types.
 [dependencies]
-waterui-core = { git = "https://github.com/water-rs/waterui", branch = "dev" }
-waterui-graphics = { git = "https://github.com/water-rs/waterui", branch = "dev" }
+waterui-core = { git = "https://github.com/water-rs/waterui", branch = "main" }
+waterui-graphics = { git = "https://github.com/water-rs/waterui", branch = "main" }
 nami = "0.13"
 wgpu = "30"
 gltf = { version = "1.4.1", features = [

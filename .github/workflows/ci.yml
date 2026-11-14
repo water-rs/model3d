@@ -53,7 +53,7 @@ jobs:
         if: runner.os == 'Windows'
         # The framework's install-dxc restores the compiler from the Actions
         # cache, so a warm run downloads nothing (water-rs/waterui#3942).
-        uses: water-rs/waterui/.github/actions/install-dxc@dev
+        uses: water-rs/waterui/.github/actions/install-dxc@main
       - name: Install SPIRV-Tools
         if: runner.os == 'Windows'
         id: msys2
